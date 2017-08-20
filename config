@@ -1,0 +1,8 @@
+GPIO_chip --> 14308
+network --> 14309
+coordinator --> 14310
+camera_queue_manager --> 14311
+camera0 --> 14312
+camera1 --> 14313
+data_cleaner --> 14307
+end_session_checker --> 14306

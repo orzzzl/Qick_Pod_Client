@@ -4,13 +4,16 @@ from threading import Thread
 from camera_manager.main import get_manager
 import requests
 import os
-
+import numpy as np
 
 class Camera:
     fourcc_code = cv2.VideoWriter_fourcc(*'H264')
-    frame_rate = 15.0
+    frame_rate = 15.0                    #if self.camera_idx == 0:
+                    #    frame = self.rotate_bound(frame, 90)
+                    #else:
+                    #    frame = self.rotate_bound(frame, 270)
     frame_count_interval = 100
-    video_dimension = (320, 240)
+    video_dimension = (240, 320)
     data_path_prefix = '/home/salil/PycharmProjects/PodClient/data/'
 
     def __init__(self, camera_idx):
@@ -28,6 +31,29 @@ class Camera:
         self.session_id = 250
         self.frame_count = 0
 
+    def rotate_bound(self, image, angle):
+        # grab the dimensions of the image and then determine the
+        # center
+        (h, w) = image.shape[:2]
+        (cX, cY) = (w // 2, h // 2)
+
+        # grab the rotation matrix (applying the negative of the
+        # angle to rotate clockwise), then grab the sine and cosine
+        # (i.e., the rotation components of the matrix)
+        M = cv2.getRotationMatrix2D((cX, cY), -angle, 1.0)
+        cos = np.abs(M[0, 0])
+        sin = np.abs(M[0, 1])
+
+        # compute the new bounding dimensions of the image
+        nW = int((h * sin) + (w * cos))
+        nH = int((h * cos) + (w * sin))
+
+        # adjust the rotation matrix to take into account translation
+        M[0, 2] += (nW / 2) - cX
+        M[1, 2] += (nH / 2) - cY
+
+        # perform the actual rotation and return the image
+        return cv2.warpAffine(image, M, (nW, nH))
 
     def write_to_db(self, file_name):
         url = 'http://127.0.0.1:14310/coordinator/write_file_to_db?file_name=%s&camera_idx=%s'
@@ -108,8 +134,13 @@ class Camera:
                     return
                 else:
                     success, frame = self.camera.read()
+                    if self.camera_idx == 1:
+                       frame = self.rotate_bound(frame, 90)
+                    else:
+                       frame = self.rotate_bound(frame, 270)
                     assert(success)
                     vw.write(frame)
+                    cv2.waitKey(15)
                     self.frame_count += 1
                     if self.send_data_to_ai:
                         cur_time = datetime.now()

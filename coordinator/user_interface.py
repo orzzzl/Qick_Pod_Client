@@ -10,7 +10,6 @@ session_status = 'FINISHED'
 session_id = -1
 pod_id = 1
 dis_able_door = False
-button_pressed = False
 start_time = None
 
 def start_recording(session_id):
@@ -20,10 +19,6 @@ def start_recording(session_id):
 def end_recording(session_id):
     end_url = 'http://127.0.0.1:14310/coordinator/end_recording?camera_list=%s&session_id=%s' % (cameras, session_id)
     Thread(target=requests.get, args=(end_url, )).start()
-
-def set_button_pressed():
-    global button_pressed
-    button_pressed = True
 
 
 def open_door():
@@ -83,15 +78,19 @@ while True:
     if session_status == 'WAIT_PPL':
         sleep(5)
         close_door()
-        button_pressed = False
+        requests.get('http://localhost:14310/coordinator/reset_button')
         session_status = 'STARTED'
 
     if session_status == 'STARTED':
         sleep(0.5)
-        if not button_pressed:
+        status = requests.get('http://localhost:14310/coordinator/get_button_status')
+        status = status.text
+        if status == 'False':
              res = get_session(session_id)
         else:
             session_status = 'CLOSING'
+            pay_session(session_id)
+            continue
         if res['status'] == 'CLOSING':
             session_status = 'CLOSING'
 

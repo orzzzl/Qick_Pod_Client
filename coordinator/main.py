@@ -37,7 +37,7 @@ def start_recording():
     cams = []
     for camera in map_obj:
         cams.append(camera)
-    cm.start_recording(cams, ai=False)
+    cm.start_recording(cams, session_id, ai=False)
     return 'success'
 
 
@@ -50,6 +50,20 @@ def end_recording():
         cams.append(camera)
     cm.end_recording(cams, ai=False)
     return 'success'
+
+@app.route('/coordinator/set_button')
+def set_button():
+    cm.set_button()
+    return 'success'
+
+@app.route('/coordinator/reset_button')
+def reset_button():
+    cm.reset_button()
+    return 'success'
+
+@app.route('/coordinator/get_button_status')
+def get_button_status():
+    return str(cm.get_button_status())
 
 
 if __name__ == '__main__':

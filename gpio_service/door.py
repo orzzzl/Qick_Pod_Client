@@ -1,7 +1,7 @@
 import serial
 from threading import Thread
 from time import sleep
-#from coordinator.user_interface import set_button_pressed
+import requests
 
 
 class Door:
@@ -19,7 +19,7 @@ class Door:
         assert self.door is not None
         self.write_cmd('')
         self.write_cmd('RELS.ON')
-     #   Thread(target=self.switch_loop).start()
+        Thread(target=self.switch_loop).start()
 
     def write_cmd(self, msg):
         whole_str = msg + '\r\n'
@@ -37,6 +37,7 @@ class Door:
             line = self.door.readline()
             if line == b'1\r\n':
                 print('button pressed')
+                requests.get('http://localhost:14310/coordinator/set_button')
                 return
             if line == b'0\r\n':
                 return

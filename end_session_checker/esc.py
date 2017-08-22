@@ -45,7 +45,6 @@ class EndSessionChecker:
             for s in EndSessionChecker._sessions:
                 if s >= 0:
                     res = EndSessionChecker._vw.get_all_tasks_by_session(0, s)
-                    print(s, res)
                     if len(res) == 0:
                         print('session uploaded:', s)
                         print('session uploaded:' + str(s))

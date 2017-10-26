@@ -38,6 +38,7 @@ class Door:
             if line == b'1\r\n':
                 print('button pressed')
                 requests.get('http://localhost:14310/coordinator/set_button')
+                requests.get('http://127.0.0.1:14308/gpio/open_door')
                 return
             if line == b'0\r\n':
                 return
@@ -45,4 +46,4 @@ class Door:
     def switch_loop(self):
         while(True):
             self.read_switch()
-            sleep(0.1)
+            sleep(0.022)

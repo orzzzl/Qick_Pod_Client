@@ -33,6 +33,7 @@ def create_session(hashed_str, pod_id):
 
 
 def pay_session(session_id):
+    print('paysession')
     headers = {
         'Accept': 'application/json',
         'Authorization': 'Bearer %s' % pod_token,
@@ -83,6 +84,7 @@ def update_ai_count(ai_count, session_id):
     return process_response(r)
 
 def leave_session(session_id):
+    print('leave sesison')
     headers = {
         'Accept': 'application/json',
         'Authorization': 'Bearer %s' % pod_token,

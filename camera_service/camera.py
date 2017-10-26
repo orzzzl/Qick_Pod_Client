@@ -117,6 +117,15 @@ class Camera:
             })
         self.is_recording = False
 
+
+    def process_frame(self, f, idx):
+        if idx == 1:
+            frame = self.rotate_bound(f, 90)
+        else:
+            frame = self.rotate_bound(f, 270)
+        frame = cv2.resize(frame, self.video_dimension)
+        return frame
+
     def record(self):
         self.frame_count = 0
         if not self.is_on:

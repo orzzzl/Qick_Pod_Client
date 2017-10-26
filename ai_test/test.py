@@ -1,16 +1,15 @@
-from camera_manager.main import get_manager
+from camera_manager.queue_manager import QueueManager
+from time import sleep
 import cv2
-from datetime import datetime
 
 
-name = 'camera1'
-m = get_manager(name)
+m = QueueManager.create_manager()
 m.connect()
-q = None
-q = getattr(m , name)()
-assert q is not None
-file_name = str(datetime.now()).replace(' ', '_') + '.avi'
-vw = cv2.VideoWriter(file_name, cv2.VideoWriter_fourcc(*'H264'), 15.0, (320, 240))
-while(True):
-    frame = q.get()
-    vw.write(frame['frame'])
+lf = m.LatestFrame1()
+
+
+while True:
+    frame = lf.get_latest()
+    print(frame)
+    cv2.imshow('r', frame['frame'])
+    cv2.waitKey(delay=1)

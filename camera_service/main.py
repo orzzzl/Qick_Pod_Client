@@ -1,6 +1,6 @@
 from flask import Flask
 import argparse
-from camera_service.camera import Camera
+from camera_service.kinnect_service import Camera
 from threading import Thread
 app = Flask(__name__)
 

@@ -4,6 +4,7 @@ from network.commercial_server import *
 import select
 import sys
 from time import sleep
+from kinnect_service.utils import *
 
 cameras = '0,1'
 session_status = 'FINISHED'
@@ -11,6 +12,23 @@ session_id = -1
 pod_id = 1
 dis_able_door = False
 start_time = None
+
+
+def is_ppl_in():
+    url = 'http://127.0.0.1:14555/walterAI/podstate'
+    r = requests.get(url).content
+    print(r)
+    return r == b's_occupied'
+    # sleep(5)
+    # return True
+
+def create_salil_session(session_id):
+    return
+    cameras = ['left','right']
+    url = 'http://localhost:32766/create_session?session_id=%s&cameras=%s' % (session_id, cameras)
+    requests.get(url)
+
+
 
 def start_recording(session_id):
     start_url = 'http://127.0.0.1:14310/coordinator/start_recording?camera_list=%s&session_id=%s' % (cameras, session_id)
@@ -25,6 +43,7 @@ def open_door():
     if dis_able_door:
         return
     url = 'http://127.0.0.1:14308/gpio/open_door'
+    print('called')
     requests.get(url)
 
 def close_door():
@@ -63,9 +82,12 @@ while True:
         line = input()
         line = line.strip()
         res = create_session(line, pod_id)
+        print(res)
         if res['open_door']:
-            session_id = res['shopping_session']['id']
+            session_id = int(res['shopping_session']['id'])
             set_id(session_id)
+            set_session_id(session_id)
+            create_salil_session(session_id)
             print('get session id: %s' % session_id)
             session_status = "WAIT_PPL"
             start_time_json = get_current_time_json()
@@ -76,27 +98,32 @@ while True:
             create_ai_session(session_id, start_time_json)
 
     if session_status == 'WAIT_PPL':
-        sleep(5)
+        sleep(0.1)
+        if is_ppl_in() == False:
+            continue
         close_door()
         requests.get('http://localhost:14310/coordinator/reset_button')
         session_status = 'STARTED'
 
     if session_status == 'STARTED':
-        sleep(0.5)
+        sleep(0.1)
         status = requests.get('http://localhost:14310/coordinator/get_button_status')
         status = status.text
         if status == 'False':
              res = get_session(session_id)
         else:
-            session_status = 'CLOSING'
+            open_door()
             pay_session(session_id)
+            session_status = 'CLOSING'
             continue
         if res['status'] == 'CLOSING':
             session_status = 'CLOSING'
+            open_door()
 
     if session_status == 'CLOSING':
-        open_door()
-        sleep(5)
+        sleep(0.1)
+        if is_ppl_in():
+            continue
         close_door()
         leave_session(session_id)
         end_time = get_current_time()
@@ -113,6 +140,7 @@ while True:
         end_recording(session_id)
         session_id = -1
         session_status = 'FINISHED'
+        end_session()
 
 
 

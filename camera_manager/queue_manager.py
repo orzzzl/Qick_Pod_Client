@@ -1,5 +1,6 @@
 from multiprocessing.managers import BaseManager
 from multiprocessing import Queue
+from camera_manager.lastest_frame import LatestFrame0, LatestFrame1
 
 
 class QueueManager(BaseManager):
@@ -29,6 +30,8 @@ class QueueManager(BaseManager):
 
     @classmethod
     def create_manager(cls):
+        QueueManager.register('LatestFrame0', callable=lambda:LatestFrame0)
+        QueueManager.register('LatestFrame1', callable=lambda: LatestFrame1)
         m = QueueManager(address=('', QueueManager.PORT), authkey=b'deepmagicsecret')
         return m
 

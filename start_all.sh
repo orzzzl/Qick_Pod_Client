@@ -3,10 +3,12 @@
 #starting manager server
 python3 camera_manager/main.py &
 
-#starting camera 0
-python3 camera_service/main.py --camera_idx=0 &
+python3 kinnect_service/set_frame.py &
 
-#starting camera 1
+##starting camera 0
+python3 camera_service/main.py --camera_idx=0 &
+#
+##starting camera 1
 python3 camera_service/main.py --camera_idx=1 &
 
 #starting coordinator
@@ -23,6 +25,9 @@ python3 data_cleaner/main.py &
 
 #esc
 python3 end_session_checker/main.py &
+
+#QickpodAi
+python3 /home/salil/QickpodAI/main.py &
 
 read cmd
 

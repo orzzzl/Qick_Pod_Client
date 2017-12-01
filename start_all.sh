@@ -21,7 +21,7 @@ python3 network/main.py &
 python3 gpio_service/main.py &
 
 #starting cleaning service
-python3 data_cleaner/main.py &
+#python3 data_cleaner/main.py &
 
 #esc
 python3 end_session_checker/main.py &

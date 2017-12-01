@@ -2,7 +2,7 @@ import requests
 from random import randint
 
 
-AI_SERVER_ADDRESS = '128.122.20.233'
+AI_SERVER_ADDRESS = '128.122.81.251'
 PORT = 8000
 http_address = 'http://' + AI_SERVER_ADDRESS + ':' + str(PORT)
 

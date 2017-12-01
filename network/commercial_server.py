@@ -20,7 +20,7 @@ def create_session(hashed_str, pod_id):
         'Accept': 'application/json',
         'Accept-Encoding': 'gzip, deflate',
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer %s' % pod_token,
+        'Authorizcreate_sessioation': 'Bearer %s' % pod_token,
     }
 
     data = {

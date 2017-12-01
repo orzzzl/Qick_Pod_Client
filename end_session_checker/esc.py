@@ -46,6 +46,7 @@ class EndSessionChecker:
                 if s >= 0:
                     res = EndSessionChecker._vw.get_all_tasks_by_session(0, s)
                     if len(res) == 0:
+                        sleep(5)
                         print('session uploaded:', s)
                         print('session uploaded:' + str(s))
                         to_be_removed.append(s)

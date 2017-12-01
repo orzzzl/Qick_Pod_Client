@@ -17,17 +17,7 @@ start_time = None
 def is_ppl_in():
     url = 'http://127.0.0.1:14555/walterAI/podstate'
     r = requests.get(url).content
-    print(r)
     return r == b's_occupied'
-    # sleep(5)
-    # return True
-
-def create_salil_session(session_id):
-    return
-    cameras = ['left','right']
-    url = 'http://localhost:32766/create_session?session_id=%s&cameras=%s' % (session_id, cameras)
-    requests.get(url)
-
 
 
 def start_recording(session_id):
@@ -60,6 +50,14 @@ def set_id(session_id):
     url = 'http://127.0.0.1:14310/coordinator/set_session_id?session_id=%s' % session_id
     requests.get(url)
 
+def set_esc_on():
+    url = 'http://127.0.0.1:14306/esc/set_on'
+    requests.get(url)
+
+def set_esc_off():
+    url = 'http://127.0.0.1:14306/esc/set_off'
+    requests.get(url)
+
 
 def clear_input(stream, timeout=0):
     while stream in select.select([stream], [], [], timeout)[0]:
@@ -84,10 +82,10 @@ while True:
         res = create_session(line, pod_id)
         print(res)
         if res['open_door']:
+            set_esc_off()
             session_id = int(res['shopping_session']['id'])
             set_id(session_id)
             set_session_id(session_id)
-            create_salil_session(session_id)
             print('get session id: %s' % session_id)
             session_status = "WAIT_PPL"
             start_time_json = get_current_time_json()
@@ -137,6 +135,7 @@ while True:
         }
         print(data)
         add_esc(session_id, data)
+        set_esc_on()
         end_recording(session_id)
         session_id = -1
         session_status = 'FINISHED'

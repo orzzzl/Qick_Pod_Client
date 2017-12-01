@@ -6,8 +6,6 @@ import requests
 import numpy as np
 from camera_manager.queue_manager import QueueManager
 from time import sleep
-from camera_service.kinnect import KinectCamera
-import sys
 
 
 class Camera:
@@ -32,6 +30,7 @@ class Camera:
             self.kinnect = self.m.LatestFrame0()
         else:
             self.kinnect = self.m.LatestFrame1()
+
 
 
     def write_to_db(self, file_name):
@@ -88,25 +87,28 @@ class Camera:
         self.is_recording = True
         while(self.is_recording):
             file_name = str(datetime.now()).replace(' ', '_') + '.avi'
+            file_name_d = str(datetime.now()).replace(' ', '_') + '_d.avi'
             print('recording file: %s' % file_name)
             vw = cv2.VideoWriter(self.data_path + file_name, Camera.fourcc_code, Camera.frame_rate, Camera.video_dimension)
+            vw_d = cv2.VideoWriter(self.data_path + file_name_d, Camera.fourcc_code, Camera.frame_rate, Camera.video_dimension)
             for frame_idx in range(Camera.frame_count_interval):
                 if not self.is_on or not self.is_recording:
-                    vw.release()
                     self.write_to_db(file_name)
+                    vw.release()
+                    vw_d.release()
                     return
                 else:
-                    frame = self.kinnect.get()
+                    frame_depth = self.kinnect.get()
+                    frame = frame_depth
                     frame = self.process_frame(frame, self.camera_idx)
-                   # frame = self.kinect.get_frames()[0]
-                    # frame = cv2.resize(frame, self.video_dimension)
-                    # else:
-                    #    frame = self.rotate_bound(frame, 270)
+                    dep = self.kinnect.get_depth()
                     vw.write(frame)
+                    vw_d.write(self.process_frame(cv2.merge((dep, dep, dep)), self.camera_idx))
                     cv2.waitKey(15)
                     self.frame_count += 1
-            vw.release()
             self.write_to_db(file_name)
+            vw.release()
+            vw_d.release()
 
 
     def stop_recording(self):

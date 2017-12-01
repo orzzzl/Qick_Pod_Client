@@ -35,6 +35,11 @@ def set_on():
     my_esc.set_on()
     return 'success'
 
+@app.route('/esc/set_off')
+def set_off():
+    my_esc.set_off()
+    return 'success'
+
 
 if __name__ == '__main__':
     app.run(port=port)
